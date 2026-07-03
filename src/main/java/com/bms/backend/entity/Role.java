@@ -1,5 +1,9 @@
 package com.bms.backend.entity;
 
-public class Role {
+public enum Role {
 
+    ADMIN,
+    LOAN_OFFICER,
+    VERIFICATION_OFFICER,
+    CUSTOMER
 }

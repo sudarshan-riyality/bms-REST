@@ -1,6 +1,7 @@
 package com.bms.backend.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class LoanApplicationController {
     @PostMapping("/{customerId}")
     public LoanApplicationResponseDto applyLoan(
             @RequestBody LoanApplicationRequestDto requestDto,
-            @PathVariable String customerId) {
+            @PathVariable UUID customerId) {
 
         return loanApplicationService.applyLoan(requestDto, customerId);
     }
@@ -33,7 +34,7 @@ public class LoanApplicationController {
 
     @GetMapping("/customer/{customerId}")
     public List<LoanApplicationResponseDto> getLoansByCustomerId(
-            @PathVariable String customerId) {
+            @PathVariable UUID customerId) {
 
         return loanApplicationService.getLoansByCustomerId(customerId);
     }

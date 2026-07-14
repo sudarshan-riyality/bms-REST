@@ -1,6 +1,7 @@
 package com.bms.backend.service.impl;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +28,23 @@ public class LoanApplicationServiceImpl implements LoanApplicationService {
     @Override
     public LoanApplicationResponseDto applyLoan(
             LoanApplicationRequestDto requestDto,
-            String customerId) {
+            UUID customerId) {
 
-    
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() ->
                         new RuntimeException("Customer not found"));
 
-       
         LoanApplication loanApplication =
                 LoanApplicationMapper.toEntity(requestDto, customer);
 
-      
         LoanApplication savedLoan =
                 loanApplicationRepository.save(loanApplication);
 
-        
         return LoanApplicationMapper.toResponseDto(savedLoan);
     }
 
     @Override
-    public LoanApplicationResponseDto getLoanById(
-            Long loanApplicationId) {
+    public LoanApplicationResponseDto getLoanById(Long loanApplicationId) {
 
         LoanApplication loanApplication =
                 loanApplicationRepository.findById(loanApplicationId)
@@ -60,13 +56,13 @@ public class LoanApplicationServiceImpl implements LoanApplicationService {
 
     @Override
     public List<LoanApplicationResponseDto> getLoansByCustomerId(
-            String customerId) {
+            UUID customerId) {
 
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() ->
                         new RuntimeException("Customer not found"));
 
-        return customer.getLoanApplications()
+        return customer.getLoans()
                 .stream()
                 .map(LoanApplicationMapper::toResponseDto)
                 .collect(Collectors.toList());

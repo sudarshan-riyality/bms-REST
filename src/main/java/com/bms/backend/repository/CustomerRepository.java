@@ -1,5 +1,13 @@
 package com.bms.backend.repository;
 
-public interface CustomerRepository {
+import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.bms.backend.entity.Customer;
+
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
 }

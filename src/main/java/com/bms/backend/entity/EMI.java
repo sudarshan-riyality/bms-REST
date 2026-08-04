@@ -1,6 +1,5 @@
 package com.bms.backend.entity;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;

@@ -11,6 +11,7 @@ import com.bms.backend.dto.LoanApplicationRequestDto;
 import com.bms.backend.dto.LoanApplicationResponseDto;
 import com.bms.backend.entity.Customer;
 import com.bms.backend.entity.LoanApplication;
+import com.bms.backend.exception.ResourceNotFoundException;
 import com.bms.backend.mapper.LoanApplicationMapper;
 import com.bms.backend.repository.CustomerRepository;
 import com.bms.backend.repository.LoanApplicationRepository;
@@ -32,7 +33,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService {
 
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() ->
-                        new RuntimeException("Customer not found"));
+                        new ResourceNotFoundException("Customer not found with ID: " + customerId));
 
         LoanApplication loanApplication =
                 LoanApplicationMapper.toEntity(requestDto, customer);
@@ -49,7 +50,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService {
         LoanApplication loanApplication =
                 loanApplicationRepository.findById(loanApplicationId)
                         .orElseThrow(() ->
-                                new RuntimeException("Loan Application not found"));
+                                new ResourceNotFoundException("Loan Application not found with ID: " + loanApplicationId));
 
         return LoanApplicationMapper.toResponseDto(loanApplication);
     }
@@ -60,7 +61,7 @@ public class LoanApplicationServiceImpl implements LoanApplicationService {
 
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() ->
-                        new RuntimeException("Customer not found"));
+                        new ResourceNotFoundException("Customer not found with ID: " + customerId));
 
         return customer.getLoans()
                 .stream()

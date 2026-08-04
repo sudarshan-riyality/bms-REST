@@ -8,6 +8,7 @@ import com.bms.backend.dto.EMIRequestdto;
 import com.bms.backend.dto.EMIResponse;
 import com.bms.backend.entity.EMI;
 import com.bms.backend.entity.LoanApplication;
+import com.bms.backend.exception.ResourceNotFoundException;
 import com.bms.backend.mapper.EMIMapper;
 import com.bms.backend.repository.EMIRepository;
 import com.bms.backend.repository.LoanApplicationRepository;
@@ -25,10 +26,10 @@ public class EMIServiceImpl implements EMIService {
     @Override
     public EMIResponse createEMI(EMIRequestdto request) {
 
-        LoanApplication loanApplication =
-                loanApplicationRepository
-                        .findById(request.getLoanApplicationId())
-                        .orElseThrow();
+        LoanApplication loanApplication = loanApplicationRepository
+                .findById(request.getLoanApplicationId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Loan Application not found with ID: " + request.getLoanApplicationId()));
 
         EMI emi = EMIMapper.toEntity(request);
 
@@ -44,7 +45,8 @@ public class EMIServiceImpl implements EMIService {
 
         EMI emi = emiRepository
                 .findById(emiId)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "EMI not found with ID: " + emiId));
 
         return EMIMapper.toResponse(emi);
     }

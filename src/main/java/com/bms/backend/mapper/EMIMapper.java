@@ -1,6 +1,5 @@
 package com.bms.backend.mapper;
 
-import com.bms.backend.dto.EMIRequest;
 import com.bms.backend.dto.EMIRequestdto;
 import com.bms.backend.dto.EMIResponse;
 import com.bms.backend.entity.EMI;

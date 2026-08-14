@@ -14,7 +14,7 @@ public class VerificationResponseDto {
 
     private UUID verificationId;
 
-    private UUID customerId;
+    private Long loanApplicationId;
 
     private VerificationStatus status;
 

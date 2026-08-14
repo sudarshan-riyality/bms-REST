@@ -8,14 +8,14 @@ import com.bms.backend.dto.VerificationResponseDto;
 public interface VerificationService {
 
     VerificationResponseDto createVerification(
-            UUID customerId,
+            Long loanApplicationId,
             VerificationRequestDto dto);
 
     VerificationResponseDto getVerificationById(
             UUID verificationId);
 
-    VerificationResponseDto getVerificationByCustomerId(
-            UUID customerId);
+    VerificationResponseDto getVerificationByLoanApplicationId(
+            Long loanApplicationId);
 
     VerificationResponseDto updateVerification(
             UUID verificationId,

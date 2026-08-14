@@ -12,6 +12,6 @@ import com.bms.backend.entity.LoanApplication;
 public interface LoanApplicationRepository
         extends JpaRepository<LoanApplication, Long> {
 
-    List<LoanApplication> findByCustomer(Customer customer);
-
+    List<LoanApplication> findByCustomer(
+            Customer customer);
 }

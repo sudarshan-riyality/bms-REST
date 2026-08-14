@@ -1,25 +1,12 @@
 package com.bms.backend.mapper;
 
-import com.bms.backend.dto.EMIRequestdto;
 import com.bms.backend.dto.EMIResponse;
 import com.bms.backend.entity.EMI;
 
 public class EMIMapper {
 
-    public static EMI toEntity(EMIRequestdto request) {
-
-        EMI emi = new EMI();
-
-        emi.setInstallmentNumber(
-                request.getInstallmentNumber());
-
-        emi.setAmount(
-                request.getAmount());
-
-        emi.setPaymentStatus(
-                request.getPaymentStatus());
-
-        return emi;
+    private EMIMapper() {
+        
     }
 
     public static EMIResponse toResponse(EMI emi) {
@@ -35,6 +22,12 @@ public class EMIMapper {
         response.setAmount(
                 emi.getAmount());
 
+        response.setPaidAmount(
+                emi.getPaidAmount());
+
+        response.setRemainingAmount(
+                emi.getRemainingAmount());
+
         response.setPaymentStatus(
                 emi.getPaymentStatus());
 
@@ -42,7 +35,7 @@ public class EMIMapper {
 
             response.setLoanApplicationId(
                     emi.getLoanApplication()
-                       .getLoanApplicationId());
+                            .getLoanApplicationId());
         }
 
         return response;

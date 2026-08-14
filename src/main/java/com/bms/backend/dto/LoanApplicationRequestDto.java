@@ -1,27 +1,31 @@
 package com.bms.backend.dto;
 
-import lombok.AllArgsConstructor;
+import com.bms.backend.entity.LoanType;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoanApplicationRequestDto {
 
-    private String customerId;
+    @NotNull
+    private LoanType loanType;
 
-    private String loanAmount;
+    @NotNull
+    @Positive
+    private Double loanAmount;
 
-    private String interestRate;
+    @NotNull
+    @Positive
+    private Double interestRate;
 
+    @NotNull
+    @Positive
     private Integer tenureMonths;
 
-    private String emiAmount;
-
     private String applicationDate;
-
-    private String status;
 }

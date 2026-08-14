@@ -5,13 +5,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +24,11 @@ public class LoanApproval {
     private UUID approvalId;
 
     @OneToOne
-    @JoinColumn(name = "loan_application_id")
+    @JoinColumn(
+            name = "loan_application_id",
+            nullable = false,
+            unique = true
+    )
     private LoanApplication loanApplication;
 
     @Enumerated(EnumType.STRING)

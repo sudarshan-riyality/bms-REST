@@ -11,50 +11,67 @@ public class LoanApplicationMapper {
             LoanApplicationRequestDto dto,
             Customer customer) {
 
-        LoanApplication loanApplication = new LoanApplication();
+        LoanApplication loan = new LoanApplication();
 
-        loanApplication.setCustomer(customer);
-        loanApplication.setLoanAmount(dto.getLoanAmount());
-        loanApplication.setInterestRate(dto.getInterestRate());
-        loanApplication.setTenureMonths(dto.getTenureMonths());
-        loanApplication.setEmiAmount(dto.getEmiAmount());
-        loanApplication.setApplicationDate(dto.getApplicationDate());
-        loanApplication.setStatus(dto.getStatus());
+        loan.setCustomer(customer);
 
-        return loanApplication;
+        loan.setLoanType(
+                dto.getLoanType());
+
+        loan.setLoanAmount(
+                dto.getLoanAmount());
+
+        loan.setInterestRate(
+                dto.getInterestRate());
+
+        loan.setTenureMonths(
+                dto.getTenureMonths());
+
+        loan.setApplicationDate(
+                dto.getApplicationDate());
+
+     
+        loan.setStatus("PENDING");
+
+        return loan;
     }
 
     public static LoanApplicationResponseDto toResponseDto(
-            LoanApplication loanApplication) {
+            LoanApplication loan) {
 
         LoanApplicationResponseDto dto =
                 new LoanApplicationResponseDto();
 
         dto.setLoanApplicationId(
-                loanApplication.getLoanApplicationId());
+                loan.getLoanApplicationId());
 
-        dto.setCustomerId(
-                loanApplication.getCustomer()
-                               .getCustomerId()
-                               .toString());
+        if (loan.getCustomer() != null) {
+            dto.setCustomerId(
+                    loan.getCustomer()
+                        .getCustomerId()
+                        .toString());
+        }
+
+        dto.setLoanType(
+                loan.getLoanType());
 
         dto.setLoanAmount(
-                loanApplication.getLoanAmount());
+                loan.getLoanAmount());
 
         dto.setInterestRate(
-                loanApplication.getInterestRate());
+                loan.getInterestRate());
 
         dto.setTenureMonths(
-                loanApplication.getTenureMonths());
+                loan.getTenureMonths());
 
         dto.setEmiAmount(
-                loanApplication.getEmiAmount());
+                loan.getEmiAmount());
 
         dto.setApplicationDate(
-                loanApplication.getApplicationDate());
+                loan.getApplicationDate());
 
         dto.setStatus(
-                loanApplication.getStatus());
+                loan.getStatus());
 
         return dto;
     }

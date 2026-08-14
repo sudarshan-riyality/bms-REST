@@ -24,8 +24,12 @@ public class Verification {
     private UUID verificationId;
 
     @OneToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(
+            name = "loan_application_id",
+            nullable = false,
+            unique = true
+    )
+    private LoanApplication loanApplication;
 
     @Enumerated(EnumType.STRING)
     private VerificationStatus status;

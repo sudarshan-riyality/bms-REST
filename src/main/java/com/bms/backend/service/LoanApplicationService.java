@@ -12,8 +12,9 @@ public interface LoanApplicationService {
             LoanApplicationRequestDto requestDto,
             UUID customerId);
 
-    LoanApplicationResponseDto getLoanById(Long loanApplicationId);
+    LoanApplicationResponseDto getLoanById(
+            Long loanApplicationId);
 
-    List<LoanApplicationResponseDto> getLoansByCustomerId(UUID customerId);
-
+    List<LoanApplicationResponseDto> getLoansByCustomerId(
+            UUID customerId);
 }

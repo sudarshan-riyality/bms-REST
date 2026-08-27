@@ -16,8 +16,11 @@ public class LoanApprovalMapper {
         LoanApproval loanApproval = new LoanApproval();
 
         loanApproval.setLoanApplication(loanApplication);
+
         loanApproval.setStatus(dto.getStatus());
+
         loanApproval.setRemarks(dto.getRemarks());
+
         loanApproval.setApprovalDate(LocalDate.now());
 
         return loanApproval;
@@ -26,14 +29,24 @@ public class LoanApprovalMapper {
     public static LoanApprovalResponseDto toResponseDto(
             LoanApproval loanApproval) {
 
-        LoanApprovalResponseDto dto = new LoanApprovalResponseDto();
+        LoanApprovalResponseDto dto =
+                new LoanApprovalResponseDto();
 
-        dto.setApprovalId(loanApproval.getApprovalId());
+        dto.setApprovalId(
+                loanApproval.getApprovalId());
+
         dto.setLoanApplicationId(
-                loanApproval.getLoanApplication().getLoanApplicationId());
-        dto.setStatus(loanApproval.getStatus());
-        dto.setRemarks(loanApproval.getRemarks());
-        dto.setApprovalDate(loanApproval.getApprovalDate());
+                loanApproval.getLoanApplication()
+                        .getLoanApplicationId());
+
+        dto.setStatus(
+                loanApproval.getStatus());
+
+        dto.setRemarks(
+                loanApproval.getRemarks());
+
+        dto.setApprovalDate(
+                loanApproval.getApprovalDate());
 
         return dto;
     }

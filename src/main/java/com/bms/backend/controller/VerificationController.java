@@ -19,15 +19,18 @@ public class VerificationController {
 
     private final VerificationService verificationService;
 
-    @PostMapping("/{customerId}")
+    
+    @PostMapping("/{loanApplicationId}")
     public ResponseEntity<VerificationResponseDto> createVerification(
-            @PathVariable UUID customerId,
+            @PathVariable Long loanApplicationId,
             @RequestBody VerificationRequestDto dto) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(verificationService.createVerification(customerId, dto));
+                .body(verificationService.createVerification(
+                        loanApplicationId, dto));
     }
 
+    
     @GetMapping("/{verificationId}")
     public ResponseEntity<VerificationResponseDto> getVerificationById(
             @PathVariable UUID verificationId) {
@@ -36,29 +39,35 @@ public class VerificationController {
                 verificationService.getVerificationById(verificationId));
     }
 
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<VerificationResponseDto> getVerificationByCustomerId(
-            @PathVariable UUID customerId) {
+    
+    @GetMapping("/loan/{loanApplicationId}")
+    public ResponseEntity<VerificationResponseDto> getVerificationByLoanApplicationId(
+            @PathVariable Long loanApplicationId) {
 
         return ResponseEntity.ok(
-                verificationService.getVerificationByCustomerId(customerId));
+                verificationService.getVerificationByLoanApplicationId(
+                        loanApplicationId));
     }
 
+   
     @PutMapping("/{verificationId}")
     public ResponseEntity<VerificationResponseDto> updateVerification(
             @PathVariable UUID verificationId,
             @RequestBody VerificationRequestDto dto) {
 
         return ResponseEntity.ok(
-                verificationService.updateVerification(verificationId, dto));
+                verificationService.updateVerification(
+                        verificationId, dto));
     }
 
+   
     @DeleteMapping("/{verificationId}")
     public ResponseEntity<String> deleteVerification(
             @PathVariable UUID verificationId) {
 
         verificationService.deleteVerification(verificationId);
 
-        return ResponseEntity.ok("Verification Deleted Successfully");
+        return ResponseEntity.ok(
+                "Verification Deleted Successfully");
     }
 }

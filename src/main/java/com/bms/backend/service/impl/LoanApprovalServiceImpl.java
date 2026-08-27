@@ -3,110 +3,228 @@ package com.bms.backend.service.impl;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bms.backend.dto.LoanApprovalRequestDto;
 import com.bms.backend.dto.LoanApprovalResponseDto;
+import com.bms.backend.entity.ApprovalStatus;
 import com.bms.backend.entity.LoanApplication;
 import com.bms.backend.entity.LoanApproval;
+import com.bms.backend.entity.Verification;
+import com.bms.backend.entity.VerificationStatus;
 import com.bms.backend.exception.ResourceNotFoundException;
 import com.bms.backend.mapper.LoanApprovalMapper;
 import com.bms.backend.repository.LoanApplicationRepository;
 import com.bms.backend.repository.LoanApprovalRepository;
+import com.bms.backend.repository.VerificationRepository;
 import com.bms.backend.service.LoanApprovalService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LoanApprovalServiceImpl implements LoanApprovalService {
+public class LoanApprovalServiceImpl
+        implements LoanApprovalService {
 
-	
-	private final LoanApprovalRepository loanApprovalRepository;
+    private final LoanApprovalRepository loanApprovalRepository;
 
-	private final LoanApplicationRepository loanApplicationRepository;
-	
-	@Override
-	public LoanApprovalResponseDto createLoanApproval(
-	        Long loanApplicationId,
-	        LoanApprovalRequestDto dto) {
+    private final LoanApplicationRepository loanApplicationRepository;
 
-	    LoanApplication loanApplication = loanApplicationRepository
-	            .findById(loanApplicationId)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                            "Loan Application not found with ID: " + loanApplicationId));
+    private final VerificationRepository verificationRepository;
 
-	    LoanApproval loanApproval =
-	            LoanApprovalMapper.toEntity(dto, loanApplication);
+    @Override
+    @Transactional
+    public LoanApprovalResponseDto createLoanApproval(
+            Long loanApplicationId,
+            LoanApprovalRequestDto dto) {
 
-	    LoanApproval savedLoanApproval =
-	            loanApprovalRepository.save(loanApproval);
+       
+        LoanApplication loanApplication =
+                loanApplicationRepository.findById(loanApplicationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Application not found with ID: "
+                                                + loanApplicationId));
 
-	    return LoanApprovalMapper.toResponseDto(savedLoanApproval);
-	}
+       
+        Verification verification =
+                verificationRepository
+                        .findByLoanApplication(loanApplication)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Verification not found for Loan Application ID: "
+                                                + loanApplicationId));
 
-	@Override
-	public LoanApprovalResponseDto getLoanApprovalById(
-	        UUID approvalId) {
+     
+        if (verification.getStatus()
+                != VerificationStatus.VERIFIED) {
 
-	    LoanApproval loanApproval = loanApprovalRepository
-	            .findById(approvalId)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                            "Loan Approval not found with ID: " + approvalId));
+            throw new IllegalStateException(
+                    "Loan cannot be approved because verification is not completed. "
+                    + "Current verification status: "
+                    + verification.getStatus());
+        }
 
-	    return LoanApprovalMapper.toResponseDto(loanApproval);
-	}
+        
+        if (loanApprovalRepository
+                .findByLoanApplication(loanApplication)
+                .isPresent()) {
 
-	@Override
-	public LoanApprovalResponseDto getLoanApprovalByLoanApplicationId(
-	        Long loanApplicationId) {
+            throw new IllegalStateException(
+                    "Loan Approval already exists for Loan Application ID: "
+                            + loanApplicationId);
+        }
 
-	    LoanApplication loanApplication = loanApplicationRepository
-	            .findById(loanApplicationId)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                            "Loan Application not found with ID: " + loanApplicationId));
+       
+        LoanApproval loanApproval =
+                LoanApprovalMapper.toEntity(
+                        dto,
+                        loanApplication);
 
-	    LoanApproval loanApproval = loanApprovalRepository
-	            .findByLoanApplication(loanApplication)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                            "Loan Approval not found for Loan Application ID: " + loanApplicationId));
+       
+        LoanApproval savedLoanApproval =
+                loanApprovalRepository.save(loanApproval);
 
-	    return LoanApprovalMapper.toResponseDto(loanApproval);
-	}
+        
+        if (dto.getStatus() == ApprovalStatus.APPROVED) {
 
-	@Override
-	public LoanApprovalResponseDto updateLoanApproval(
-	        UUID approvalId,
-	        LoanApprovalRequestDto dto) {
+            loanApplication.setStatus("APPROVED");
 
-	    LoanApproval loanApproval = loanApprovalRepository
-	            .findById(approvalId)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                            "Loan Approval not found with ID: " + approvalId));
+        } else if (dto.getStatus() == ApprovalStatus.REJECTED) {
 
-	    loanApproval.setStatus(dto.getStatus());
-	    loanApproval.setRemarks(dto.getRemarks());
+            loanApplication.setStatus("REJECTED");
 
-	    LoanApproval updatedLoanApproval =
-	            loanApprovalRepository.save(loanApproval);
+        } else {
 
-	    return LoanApprovalMapper.toResponseDto(updatedLoanApproval);
-	}
+            loanApplication.setStatus("PENDING");
+        }
 
-	@Override
-	public void deleteLoanApproval(
-	        UUID approvalId) {
+    
+        loanApplicationRepository.save(loanApplication);
 
-	    LoanApproval loanApproval = loanApprovalRepository
-	            .findById(approvalId)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                            "Loan Approval not found with ID: " + approvalId));
+    
+        return LoanApprovalMapper.toResponseDto(
+                savedLoanApproval);
+    }
 
-	    loanApprovalRepository.delete(loanApproval);
-	}
+    @Override
+    public LoanApprovalResponseDto getLoanApprovalById(
+            UUID approvalId) {
+
+        LoanApproval loanApproval =
+                loanApprovalRepository.findById(approvalId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Approval not found with ID: "
+                                                + approvalId));
+
+        return LoanApprovalMapper.toResponseDto(
+                loanApproval);
+    }
+
+    @Override
+    public LoanApprovalResponseDto
+    getLoanApprovalByLoanApplicationId(
+            Long loanApplicationId) {
+
+        LoanApplication loanApplication =
+                loanApplicationRepository.findById(loanApplicationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Application not found with ID: "
+                                                + loanApplicationId));
+
+        LoanApproval loanApproval =
+                loanApprovalRepository
+                        .findByLoanApplication(loanApplication)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Approval not found for Loan Application ID: "
+                                                + loanApplicationId));
+
+        return LoanApprovalMapper.toResponseDto(
+                loanApproval);
+    }
+
+    @Override
+    @Transactional
+    public LoanApprovalResponseDto updateLoanApproval(
+            UUID approvalId,
+            LoanApprovalRequestDto dto) {
+
+        
+        LoanApproval loanApproval =
+                loanApprovalRepository.findById(approvalId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Approval not found with ID: "
+                                                + approvalId));
+
+      
+        LoanApplication loanApplication =
+                loanApproval.getLoanApplication();
+
+     
+        Verification verification =
+                verificationRepository
+                        .findByLoanApplication(loanApplication)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Verification not found for Loan Application ID: "
+                                                + loanApplication
+                                                        .getLoanApplicationId()));
+
+      
+        if (verification.getStatus()
+                != VerificationStatus.VERIFIED) {
+
+            throw new IllegalStateException(
+                    "Loan cannot be approved because verification is not completed. "
+                    + "Current verification status: "
+                    + verification.getStatus());
+        }
+
+  
+        if (dto.getStatus() != null) {
+            loanApproval.setStatus(dto.getStatus());
+        }
+
+        if (dto.getRemarks() != null) {
+            loanApproval.setRemarks(dto.getRemarks());
+        }
+
+        
+        if (dto.getStatus() == ApprovalStatus.APPROVED) {
+
+            loanApplication.setStatus("APPROVED");
+
+        } else if (dto.getStatus() == ApprovalStatus.REJECTED) {
+
+            loanApplication.setStatus("REJECTED");
+        }
+
+        
+        LoanApproval updatedLoanApproval =
+                loanApprovalRepository.save(loanApproval);
+
+        loanApplicationRepository.save(loanApplication);
+
+      
+        return LoanApprovalMapper.toResponseDto(
+                updatedLoanApproval);
+    }
+
+    @Override
+    public void deleteLoanApproval(
+            UUID approvalId) {
+
+        LoanApproval loanApproval =
+                loanApprovalRepository.findById(approvalId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Approval not found with ID: "
+                                                + approvalId));
+
+        loanApprovalRepository.delete(loanApproval);
+    }
 }

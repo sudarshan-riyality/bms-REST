@@ -19,15 +19,18 @@ public class LoanApprovalController {
 
     private final LoanApprovalService loanApprovalService;
 
+    
     @PostMapping("/{loanApplicationId}")
     public ResponseEntity<LoanApprovalResponseDto> createLoanApproval(
             @PathVariable Long loanApplicationId,
             @RequestBody LoanApprovalRequestDto dto) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(loanApprovalService.createLoanApproval(loanApplicationId, dto));
+                .body(loanApprovalService.createLoanApproval(
+                        loanApplicationId, dto));
     }
 
+    
     @GetMapping("/{approvalId}")
     public ResponseEntity<LoanApprovalResponseDto> getLoanApprovalById(
             @PathVariable UUID approvalId) {
@@ -36,29 +39,37 @@ public class LoanApprovalController {
                 loanApprovalService.getLoanApprovalById(approvalId));
     }
 
+   
     @GetMapping("/loan/{loanApplicationId}")
-    public ResponseEntity<LoanApprovalResponseDto> getLoanApprovalByLoanApplicationId(
+    public ResponseEntity<LoanApprovalResponseDto>
+    getLoanApprovalByLoanApplicationId(
             @PathVariable Long loanApplicationId) {
 
         return ResponseEntity.ok(
-                loanApprovalService.getLoanApprovalByLoanApplicationId(loanApplicationId));
+                loanApprovalService
+                        .getLoanApprovalByLoanApplicationId(
+                                loanApplicationId));
     }
 
+    
     @PutMapping("/{approvalId}")
     public ResponseEntity<LoanApprovalResponseDto> updateLoanApproval(
             @PathVariable UUID approvalId,
             @RequestBody LoanApprovalRequestDto dto) {
 
         return ResponseEntity.ok(
-                loanApprovalService.updateLoanApproval(approvalId, dto));
+                loanApprovalService.updateLoanApproval(
+                        approvalId, dto));
     }
 
+ 
     @DeleteMapping("/{approvalId}")
     public ResponseEntity<String> deleteLoanApproval(
             @PathVariable UUID approvalId) {
 
         loanApprovalService.deleteLoanApproval(approvalId);
 
-        return ResponseEntity.ok("Loan Approval Deleted Successfully");
+        return ResponseEntity.ok(
+                "Loan Approval Deleted Successfully");
     }
 }

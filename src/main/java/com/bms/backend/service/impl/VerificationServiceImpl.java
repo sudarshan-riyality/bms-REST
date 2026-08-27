@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.bms.backend.dto.VerificationRequestDto;
 import com.bms.backend.dto.VerificationResponseDto;
-import com.bms.backend.entity.Customer;
+import com.bms.backend.entity.LoanApplication;
 import com.bms.backend.entity.Verification;
 import com.bms.backend.exception.ResourceNotFoundException;
 import com.bms.backend.mapper.VerificationMapper;
-import com.bms.backend.repository.CustomerRepository;
+import com.bms.backend.repository.LoanApplicationRepository;
 import com.bms.backend.repository.VerificationRepository;
 import com.bms.backend.service.VerificationService;
 
@@ -18,61 +18,86 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class VerificationServiceImpl implements VerificationService {
+public class VerificationServiceImpl
+        implements VerificationService {
 
-	
-	private final VerificationRepository verificationRepository;
+    private final VerificationRepository verificationRepository;
 
-    private final CustomerRepository customerRepository;
-	
-	
+    private final LoanApplicationRepository loanApplicationRepository;
+
     @Override
     public VerificationResponseDto createVerification(
-            UUID customerId,
+            Long loanApplicationId,
             VerificationRequestDto dto) {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Customer not found with ID: " + customerId));
+        
+        LoanApplication loanApplication =
+                loanApplicationRepository.findById(loanApplicationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Application not found with ID: "
+                                                + loanApplicationId));
 
+     
+        if (verificationRepository
+                .findByLoanApplication(loanApplication)
+                .isPresent()) {
+
+            throw new IllegalStateException(
+                    "Verification already exists for Loan Application ID: "
+                            + loanApplicationId);
+        }
+
+        
         Verification verification =
-                VerificationMapper.toEntity(dto, customer);
+                VerificationMapper.toEntity(
+                        dto,
+                        loanApplication);
 
+      
         Verification savedVerification =
                 verificationRepository.save(verification);
 
-        return VerificationMapper.toResponseDto(savedVerification);
+        return VerificationMapper.toResponseDto(
+                savedVerification);
     }
 
     @Override
     public VerificationResponseDto getVerificationById(
             UUID verificationId) {
 
-        Verification verification = verificationRepository
-                .findById(verificationId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Verification not found with ID: " + verificationId));
+        Verification verification =
+                verificationRepository.findById(verificationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Verification not found with ID: "
+                                                + verificationId));
 
-        return VerificationMapper.toResponseDto(verification);
+        return VerificationMapper.toResponseDto(
+                verification);
     }
 
     @Override
-    public VerificationResponseDto getVerificationByCustomerId(
-            UUID customerId) {
+    public VerificationResponseDto getVerificationByLoanApplicationId(
+            Long loanApplicationId) {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Customer not found with ID: " + customerId));
+        LoanApplication loanApplication =
+                loanApplicationRepository.findById(loanApplicationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Loan Application not found with ID: "
+                                                + loanApplicationId));
 
-        Verification verification = verificationRepository
-                .findByCustomer(customer)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Verification not found for Customer ID: " + customerId));
+        Verification verification =
+                verificationRepository
+                        .findByLoanApplication(loanApplication)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Verification not found for Loan Application ID: "
+                                                + loanApplicationId));
 
-        return VerificationMapper.toResponseDto(verification);
+        return VerificationMapper.toResponseDto(
+                verification);
     }
 
     @Override
@@ -80,30 +105,40 @@ public class VerificationServiceImpl implements VerificationService {
             UUID verificationId,
             VerificationRequestDto dto) {
 
-        Verification verification = verificationRepository
-                .findById(verificationId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Verification not found with ID: " + verificationId));
+        Verification verification =
+                verificationRepository.findById(verificationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Verification not found with ID: "
+                                                + verificationId));
 
-        verification.setStatus(dto.getStatus());
-        verification.setRemarks(dto.getRemarks());
+   
+        if (dto.getStatus() != null) {
+            verification.setStatus(dto.getStatus());
+        }
+
+        
+        if (dto.getRemarks() != null) {
+            verification.setRemarks(dto.getRemarks());
+        }
 
         Verification updatedVerification =
                 verificationRepository.save(verification);
 
-        return VerificationMapper.toResponseDto(updatedVerification);
+        return VerificationMapper.toResponseDto(
+                updatedVerification);
     }
 
     @Override
     public void deleteVerification(
             UUID verificationId) {
 
-        Verification verification = verificationRepository
-                .findById(verificationId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Verification not found with ID: " + verificationId));
+        Verification verification =
+                verificationRepository.findById(verificationId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Verification not found with ID: "
+                                                + verificationId));
 
         verificationRepository.delete(verification);
     }

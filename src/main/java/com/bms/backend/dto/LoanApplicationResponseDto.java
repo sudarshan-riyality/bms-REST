@@ -1,24 +1,30 @@
 package com.bms.backend.dto;
 
-import lombok.Data;
+import com.bms.backend.entity.LoanType;
 
-@Data
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoanApplicationResponseDto {
 
     private Long loanApplicationId;
 
     private String customerId;
 
-    private String loanAmount;
+    private LoanType loanType;
 
-    private String interestRate;
+    private Double loanAmount;
+
+    private Double interestRate;
 
     private Integer tenureMonths;
 
-    private String emiAmount;
+    private Double emiAmount;
 
     private String applicationDate;
 
     private String status;
-
 }
